@@ -1,0 +1,62 @@
+<div class="hero-unit">
+  <h2>All Messages</h2>
+  <%- linkTo('Create a new Message', addMessagePath, {class: 'btn pull-right'}); %>
+</div>
+
+<div id="messages-list">
+<% if (messages) { %>
+<% for (var i = 0, ii = messages.length; i < ii; i++) { %>
+  <div class="row list-item" id="message-<%= messages[i].id; %>">
+    <div class="span8">
+      <h3><%- linkTo(messages[i].id, messagePath(messages[i].id)); %></h3>
+    </div>
+    <div class="span4">
+      <h3><i class="icon-list-alt"></i><%= messages[i].body; %></h3>
+    </div>
+  </div>
+<% } %>
+<% } %>
+</div>
+
+<script type="text/javascript">
+$(function () {
+  geddy.io.addListenersForModels(['Message']);
+
+  var renderTemplate = function (message) {
+    var template = [ ''
+      , '<div class="row list-item" id="message-' + message.id + '">'
+      , '  <div class="span8">'
+      , '    <h3><a href="/messages/' + message.id + '">' + message.id + '</a></h3>'
+      , '  </div>'
+      , '  <div class="span4">'
+      , '    <h3><i class="icon-list-alt"></i>' + message.body + '</h3>'
+      , '  </div>'
+      , '</div>'
+    ].join('');
+
+    return $(template);
+  }
+
+  var MessagesController = function (opts) {
+    this.options = opts || {};
+
+    this.create = function (message) {
+      $('#messages-list').append(renderTemplate(message));
+    };
+
+    this.update = function (message) {
+      $('#message-' + message.id).replaceWith(renderTemplate(message));
+    };
+
+    this.remove = function (id) {
+      $('#message-' + id).remove();
+    };
+
+  };
+  geddy.Messages = new MessagesController();
+
+  geddy.model.Message.on('save'   , geddy.Messages.create);
+  geddy.model.Message.on('update' , geddy.Messages.update);
+  geddy.model.Message.on('remove' , geddy.Messages.remove);
+});
+</script>

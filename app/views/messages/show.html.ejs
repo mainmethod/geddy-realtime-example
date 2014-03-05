@@ -1,0 +1,40 @@
+<div class="hero-unit">
+  <h2 class="id"><%= message.id %></h2>
+  <%- linkTo('Edit this message', editMessagePath(params.id), {class: 'btn pull-right'}); %>
+  <%- linkTo('Back to list', messagePath(''), {class: 'btn pull-right'}); %>
+</div>
+
+<h2>Message Properties</h2>
+<% for(var i in message) { -%>
+<% if(i !== 'saved') { -%>
+<div class="row list-item">
+  <div class="span4">
+    <h3><%= i %></h3>
+  </div>
+  <div class="span8">
+    <h3><i class="icon-list-alt"></i><span class="<%= i %>"><%= message[i] %></span></h3>
+  </div>
+</div>
+<% } -%><% } -%>
+<script type="text/javascript">
+$(function () {
+  var pageId = window.location.pathname.split('/')[2];
+
+  geddy.io.addListenersForModels(['Message']);
+
+  geddy.model.Message.on('update', function (message) {
+    if (message.id == pageId) {
+      var properties = message.toData();
+      for (var i in properties) {
+        $('.'+i).text(properties[i]);
+      }
+    }
+  });
+
+  geddy.model.Message.on('remove', function (id) {
+    if (id == pageId) {
+      window.location = '/messages';
+    }
+  });
+});
+</script>
